@@ -18,7 +18,6 @@ const messaging = getMessaging(app);
 window.getFCMToken = async (reg) => {
   return await getToken(messaging, {
     serviceWorkerRegistration: reg,
-    vapidKey:
-      "BK3iu2B6AEsQAllTUL1umC0yaUYkvI3wU-1j9O5Qc9Y17G4UpuBY6Bjpb-_cI_vfiljwu3HN9ybkD1E0SkSDxVw",
+    vapidKey: "AIzaSyD1FlnMJN9ThCuIXqqg5fyuiia62W81BSI",
   });
 };
