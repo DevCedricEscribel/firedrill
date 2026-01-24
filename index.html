@@ -13,6 +13,8 @@
     <p>This works offline and can be installed.</p>
 
     <button id="installBtn" style="display: none">📲 Install App</button>
+    <button id="showTokenBtn">💡 Show FCM Token</button>
+    <p id="tokenDisplay" style="word-break: break-all"></p>
 
     <script>
       // Service Worker
@@ -51,26 +53,43 @@
       } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
 
       const firebaseConfig = {
-        apiKey: "AIzaSyD1FlnMJN9ThCuIXqqg5fyuiia62W81BSI",
-        authDomain: "firedrill-8bb54.firebaseapp.com",
-        projectId: "firedrill-8bb54",
-        storageBucket: "firedrill-8bb54.firebasestorage.app",
-        messagingSenderId: "7847919788",
-        appId: "1:7847919788:web:8dc410bd5c25a3e17edf09",
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT.firebaseapp.com",
+        projectId: "YOUR_PROJECT",
+        storageBucket: "YOUR_PROJECT.appspot.com",
+        messagingSenderId: "SENDER_ID",
+        appId: "APP_ID",
       };
 
       const app = initializeApp(firebaseConfig);
       const messaging = getMessaging(app);
 
-      // Ask permission
+      let fcmToken = null;
+
+      // Ask permission and get token
       Notification.requestPermission().then((permission) => {
         if (permission === "granted") {
-          getToken(messaging, {
-            vapidKey:
-              "BHVJaIpEzmiy1WPbH-k4RuL5XKtdfr5abCWSKOmnaOIR6EMAkQGSp-y_0H7MEweNd48we8hE7gOKwYEA5f0umFQ",
-          }).then((token) => {
-            console.log("✅ FCM Token:", token);
-          });
+          getToken(messaging, { vapidKey: "YOUR_PUBLIC_VAPID_KEY" })
+            .then((token) => {
+              fcmToken = token;
+              console.log("✅ FCM Token:", token);
+            })
+            .catch((err) => console.error("❌ Error getting FCM token:", err));
+        } else {
+          console.log("❌ Notification permission denied");
+        }
+      });
+
+      // Show token button
+      const showTokenBtn = document.getElementById("showTokenBtn");
+      const tokenDisplay = document.getElementById("tokenDisplay");
+
+      showTokenBtn.addEventListener("click", () => {
+        if (fcmToken) {
+          tokenDisplay.textContent = fcmToken;
+        } else {
+          tokenDisplay.textContent =
+            "Token not available yet. Make sure notifications are allowed.";
         }
       });
 
