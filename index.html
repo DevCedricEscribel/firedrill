@@ -1,46 +1,83 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>My Simple PWA</title>
+  <head>
+    <meta charset="UTF-8" />
+    <title>My Simple PWA</title>
 
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0d6efd">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#0d6efd" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body>
+    <h1>🚀 My Simple PWA</h1>
+    <p>This works offline and can be installed.</p>
 
-</head>
-<body>
-  <h1>🚀 My Simple PWA</h1>
-  <p>This works offline and can be installed.</p>
+    <button id="installBtn" style="display: none">📲 Install App</button>
 
-  <button id="installBtn" style="display:none;">📲 Install App</button>
+    <script>
+      // Service Worker
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/firebase-messaging-sw.js");
+      }
 
-  <script>
-    // Service Worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js');
-    }
+      let deferredPrompt;
+      const installBtn = document.getElementById("installBtn");
 
-    let deferredPrompt;
-    const installBtn = document.getElementById('installBtn');
+      window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installBtn.style.display = "inline-block";
+      });
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installBtn.style.display = 'inline-block';
-    });
+      installBtn.addEventListener("click", async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        installBtn.style.display = "none";
+      });
 
-    installBtn.addEventListener('click', async () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      installBtn.style.display = 'none';
-    });
+      window.addEventListener("appinstalled", () => {
+        installBtn.style.display = "none";
+      });
+    </script>
 
-    window.addEventListener('appinstalled', () => {
-      installBtn.style.display = 'none';
-    });
-  </script>
-</body>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import {
+        getMessaging,
+        getToken,
+        onMessage,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyD1FlnMJN9ThCuIXqqg5fyuiia62W81BSI",
+        authDomain: "firedrill-8bb54.firebaseapp.com",
+        projectId: "firedrill-8bb54",
+        storageBucket: "firedrill-8bb54.firebasestorage.app",
+        messagingSenderId: "7847919788",
+        appId: "1:7847919788:web:8dc410bd5c25a3e17edf09",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const messaging = getMessaging(app);
+
+      // Ask permission
+      Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+          getToken(messaging, {
+            vapidKey:
+              "BHVJaIpEzmiy1WPbH-k4RuL5XKtdfr5abCWSKOmnaOIR6EMAkQGSp-y_0H7MEweNd48we8hE7gOKwYEA5f0umFQ",
+          }).then((token) => {
+            console.log("✅ FCM Token:", token);
+          });
+        }
+      });
+
+      // Foreground messages
+      onMessage(messaging, (payload) => {
+        console.log("📩 Message received:", payload);
+      });
+    </script>
+  </body>
 </html>
