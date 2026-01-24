@@ -1,13 +1,12 @@
-# Fire Drill PWA (Vercel Ready)
+# Fire Drill Alert PWA (Firebase FCM)
 
-## How to test
-1. Deploy folder to Vercel
-2. Open on Android Chrome
-3. Install PWA
-4. Enable notifications
+Deploy on Vercel as a static site.
 
-## To enable real push alerts
-- Create Firebase project
-- Enable Cloud Messaging
-- Replace firebase-config.js
-- Send push via Firebase console
+Setup:
+1. Create Firebase project
+2. Enable Cloud Messaging
+3. Generate Web Push VAPID key
+4. Replace Firebase config values
+
+Send alert:
+Firebase Console → Cloud Messaging → Send test message
